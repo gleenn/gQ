@@ -3,14 +3,15 @@ package com.gleenn.android.gq;
 import android.app.Activity;
 import android.app.Dialog;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class GQ {
+    private static View lastContext;
     private View[] views;
-    private Dialog[] dialogs;
-    private Activity[] activities;
 
     public GQ(View... views) {
         this.views = views;
@@ -29,14 +30,18 @@ public class GQ {
 //    }
 
     public static GQ gQ(Dialog dialog) {
+        lastContext = dialog.getCurrentFocus();
         return new GQ(dialog.getWindow().getCurrentFocus());
     }
 
     public static GQ gQ(Activity activity) {
+        lastContext = activity.getWindow().getCurrentFocus();
         return new GQ(activity.getWindow().getCurrentFocus());
     }
 
     public GQ find(int... ids) {
+        if(views.length == 0 && lastContext != null) views = new View[]{lastContext};
+
         List<View> views = new ArrayList<View>();
         for (int i=0; i<ids.length; i++) {
             for(View view : views) {
@@ -53,6 +58,43 @@ public class GQ {
     public GQ toggle() {
         for (View view : views) {
             view.setVisibility(view.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
+        }
+        return this;
+    }
+
+    public GQ show() {
+        for (View view : views) {
+            view.setVisibility(View.VISIBLE);
+        }
+        return this;
+    }
+
+    public GQ hide() {
+        for (View view : views) {
+            view.setVisibility(View.INVISIBLE);
+        }
+        return this;
+    }
+
+    public GQ gone() {
+        for (View view : views) {
+            view.setVisibility(View.GONE);
+        }
+        return this;
+    }
+
+    public GQ text(String text) {
+        for (View view : views) {
+            if(view instanceof TextView)
+                ((TextView) view).setText(text);
+        }
+        return this;
+    }
+
+    public GQ draw(int id) {
+        for (View view : views) {
+            if(view instanceof ImageView)
+                ((ImageView) view).setImageResource(id);
         }
         return this;
     }
